@@ -41,16 +41,3 @@ set_tmux_option() {
 	value="$2"
 	tmux set-option -gq "$option" "$value"
 }
-
-# multiple tmux server detection helpers
-
-current_tmux_server_pid() {
-	echo "$TMUX" |
-		cut -f2 -d","
-}
-
-all_tmux_processes() {
-	# ignores `tmux source-file .tmux.conf` command used to reload tmux.conf
-	user_id=$(id -u)
-	ps -u "$user_id" -o "command pid" "^tmux" -v "^tmux source"
-}
