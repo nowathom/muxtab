@@ -11,10 +11,11 @@ main() {
 	# acquire lock
 	PID_LOCKFILE=${LOCKFILE}.$$
 	touch ${PID_LOCKFILE}
-	ln -s ${LOCKFILE} ${PID_LOCKFILE} 2>/dev/null
+	ln -s ${PID_LOCKFILE} ${LOCKFILE} 2>/dev/null
 	ret=$?
-	if [ -n "${ret}" ]; then
+	if [ "${ret}" -ne 0 ]; then
 		# another timer is running
+		rm -f ${PID_LOCKFILE}
 		exit 0
 	fi
 	trap 'rm -f ${LOCKFILE}; exit 0' INT TERM EXIT
@@ -49,8 +50,7 @@ main() {
 
 		# check if interval is a number
 		case "$interval" in
-		*[!0-9]*) ;;
-		*) exit 0 ;;
+		'' | *[!0-9]*) continue ;;
 		esac
 
 		# check if the command is due to be run
@@ -71,6 +71,7 @@ main() {
 
 	# release lock
 	rm -f ${LOCKFILE}
+	rm -f ${PID_LOCKFILE}
 }
 
 main
